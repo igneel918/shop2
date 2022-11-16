@@ -1,97 +1,96 @@
-import * as  types from "./actionTypes"
-import {auth} from "../../firebase/firebase"
-import { signInWithEmailAndPassword,onAuthStateChanged,createUserWithEmailAndPassword,signOut } from "firebase/auth"
-import { navigate } from "../../navigation/navigationRef"
+import * as types from "./actionTypes";
+import { auth } from "../../firebase/firebase";
+import {
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
+import { navigate } from "../../navigation/navigationRef";
 
-const registerStart = () =>({
-  type:types.REGISTER_START,
-})
+const registerStart = () => ({
+  type: types.REGISTER_START,
+});
 
-const registerSuccess = (user) =>({
-  type:types.REGISTER_SUCCESS,
-  payload:user,
-})
+const registerSuccess = (user) => ({
+  type: types.REGISTER_SUCCESS,
+  payload: user,
+});
 
-const registerFail = (error) =>({
-  type:types.REGISTER_FAIL,
-  payload:error,
-})
+const registerFail = (error) => ({
+  type: types.REGISTER_FAIL,
+  payload: error,
+});
 
+const loginStart = () => ({
+  type: types.LOGIN_START,
+});
 
-const loginStart = () =>({
-  type:types.LOGIN_START,
-})
+const loginSuccess = (user) => ({
+  type: types.LOGIN_SUCCESS,
+  payload: user,
+});
 
-const loginSuccess = (user) =>({
-  type:types.LOGIN_SUCCESS,
-  payload:user,
-})
+const loginFail = (error) => ({
+  type: types.LOGIN_FAIL,
+  payload: error,
+});
 
-const loginFail = (error) =>({
-  type:types.LOGIN_FAIL,
-  payload:error,
-})
+const logoutStart = () => ({
+  type: types.LOGOUT_START,
+});
 
+const logoutSuccess = () => ({
+  type: types.LOGOUT_SUCCESS,
+});
 
+const logoutFail = (error) => ({
+  type: types.LOGOUT_FAIL,
+  payload: error,
+});
 
-const logoutStart = () =>({
-  type:types.LOGOUT_START,
-})
+export const setUser = (user) => ({
+  type: types.SET_USER,
+  payload: user,
+});
 
-const logoutSuccess = () =>({
-  type:types.LOGOUT_SUCCESS,
-})
+export const registerInitiate = (email, password) => {
+  return function (dispatch) {
+    dispatch(registerStart());
 
-const logoutFail = (error) =>({
-  type:types.LOGOUT_FAIL,
-  payload:error,
-})
-
-export const setUser = (user) =>({
-  type:types.SET_USER,
-  payload:user,
-})
-
-
-export const registerInitiate = (email,password)=>{
-  return function (dispatch){
-      dispatch(registerStart());
-      
-      createUserWithEmailAndPassword(auth,email,password).then(
-        ({user})=>{
-          navigate('signout')
-          dispatch(registerSuccess(user))
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(({ user }) => {
+        navigate("signout");
+        dispatch(registerSuccess(user));
       })
-      .catch((error)=>dispatch(registerFail(error.message)));
-  }
-}
+      .catch((error) => dispatch(registerFail(error.message)));
+  };
+};
 
-export const loginInitiate = (email,password)=>{
-  return function (dispatch){
-      dispatch(loginStart());
-      
-      signInWithEmailAndPassword(auth,email,password).then(
-        ({user})=>{
-          navigate('signout')
-          dispatch(loginSuccess(user))
+export const loginInitiate = (email, password) => {
+  return function (dispatch) {
+    dispatch(loginStart());
+
+    signInWithEmailAndPassword(auth, email, password)
+      .then(({ user }) => {
+        navigate("signout");
+        dispatch(loginSuccess(user));
       })
-      .catch(
-        (error)=>{
-          dispatch(loginFail(error.message)
-          )});
-  }
-}
+      .catch((error) => {
+        dispatch(loginFail(error.message));
+      });
+  };
+};
 
+export const logoutInitiate = () => {
+  return function (dispatch) {
+    dispatch(logoutStart());
 
-export const logoutInitiate = ()=>{
-  return function (dispatch){
-      dispatch(logoutStart());
-
-      signOut(auth)
-      .then((resp)=>{
-        navigate('login')
-        dispatch(logoutSuccess())})
-      .catch((error)=>dispatch(logoutFail(error.message)));
-  }
-}
-
+    signOut(auth)
+      .then((resp) => {
+        navigate("login");
+        dispatch(logoutSuccess());
+      })
+      .catch((error) => dispatch(logoutFail(error.message)));
+  };
+};
